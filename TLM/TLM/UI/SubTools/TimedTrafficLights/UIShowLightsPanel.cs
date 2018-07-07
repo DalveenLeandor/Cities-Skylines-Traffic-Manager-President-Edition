@@ -140,7 +140,7 @@ namespace TrafficManager.UI.SubTools.TimedTrafficLights {
 			}
 
 			private readonly IList<UICellDefinition> cellDefinitions = new List<UICellDefinition> {
-				new UICellDefinition(),
+				new UICellDefinition(UICellWidthMode.Absolute, 75f),
 				new UICellDefinition(UICellWidthMode.Absolute, 75f),
 				new UICellDefinition(UICellWidthMode.Absolute, UIToolButton.BUTTON_SIZE),
 				new UICellDefinition(UICellWidthMode.Absolute, UIToolButton.BUTTON_SIZE),
@@ -199,7 +199,11 @@ namespace TrafficManager.UI.SubTools.TimedTrafficLights {
 				base.Update();
 
 				ITimedTrafficLights ttl = UISelectNodePanel.Instance.Tool.MasterTimedTrafficLights;
-				//Log._Debug($"UIStepRow.Update() called: ttl={ttl != null}");
+				if (ttl == null) {
+					Log._Debug($"UIStepRow.Update() called: ttl is null");
+					return;
+				}
+
 				ITimedTrafficLightsStep step = ttl.GetStep(StepIndex);
 
 				//Log._Debug($"UIStepRow.Update() called: step={step != null} NameLabel={NameLabel} TimeLabel={TimeLabel}");

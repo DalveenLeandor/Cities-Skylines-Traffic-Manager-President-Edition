@@ -75,7 +75,7 @@ namespace TrafficManager.UI
 			MainMenuButtonTexture2D.name = "TMPE_MainMenuButtonIcon";
 
 			// main menu buttons
-			MainMenuButtonsTexture2D = LoadDllResource("mainmenu-btns.png", 960, 30);
+			MainMenuButtonsTexture2D = LoadDllResource("mainmenu-btns.png", 1600, 50);
 			MainMenuButtonsTexture2D.name = "TMPE_MainMenuButtons";
 
 			// main menu buttons

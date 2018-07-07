@@ -108,6 +108,10 @@ namespace TrafficManager.UI {
 			bool supportsDisabledFg = false;
 
 			foreach (ButtonMouseStates mouseState in EnumUtil.GetValues<ButtonMouseStates>()) {
+				if (mouseState == ButtonMouseStates.None) {
+					continue;
+				}
+
 				if ((mouseState & SupportedBgMouseStatesMask) != ButtonMouseStates.None) {
 					++bgMouseStates;
 				} else if (mouseState == ButtonMouseStates.Base) {
@@ -122,6 +126,10 @@ namespace TrafficManager.UI {
 			}
 
 			foreach (ButtonFunctionStates functionState in EnumUtil.GetValues<ButtonFunctionStates>()) {
+				if (functionState == ButtonFunctionStates.None) {
+					continue;
+				}
+
 				if ((functionState & SupportedBgFunctionStatesMask) != ButtonFunctionStates.None) {
 					if (functionState == ButtonFunctionStates.Disabled) {
 						supportsDisabledBg = true;
@@ -146,6 +154,19 @@ namespace TrafficManager.UI {
 			string[] textureIds = new string[bgMouseStates * bgFunctionStates + (supportsDisabledBg ? 1 : 0) + FunctionNames.Length * (fgMouseStates * fgFunctionStates + (supportsDisabledFg ? 1 : 0))];
 
 			int i = 0;
+
+			/*
+			 * Background textures (Mouse state, Function state):
+			 *		(Base, Default)
+			 *		(Base, Active)
+			 *		(Base, Disabled)
+			 *		(Hovered, Default)
+			 *		(Hovered, Active)
+			 *		(Pressed, Default)
+			 *		(Pressed, Active)
+			 *		(Focused, Default),
+			 *		(Focused, Active)
+			 */
 			foreach (ButtonMouseStates mouseState in EnumUtil.GetValues<ButtonMouseStates>()) {
 				if ((mouseState & SupportedBgMouseStatesMask) == ButtonMouseStates.None) {
 					continue;
@@ -164,6 +185,18 @@ namespace TrafficManager.UI {
 				}
 			}
 
+			/*
+			 * Foreground textures (Mouse state, Function state):
+			 *		(Base, Default)
+			 *		(Base, Active)
+			 *		(Base, Disabled)
+			 *		(Hovered, Default)
+			 *		(Hovered, Active)
+			 *		(Pressed, Default)
+			 *		(Pressed, Active)
+			 *		(Focused, Default),
+			 *		(Focused, Active)
+			 */
 			foreach (string function in FunctionNames) {
 				foreach (ButtonMouseStates mouseState in EnumUtil.GetValues<ButtonMouseStates>()) {
 					if ((mouseState & SupportedFgMouseStatesMask) == ButtonMouseStates.None) {
@@ -171,11 +204,11 @@ namespace TrafficManager.UI {
 					}
 
 					foreach (ButtonFunctionStates functionState in EnumUtil.GetValues<ButtonFunctionStates>()) {
-						if (functionState == ButtonFunctionStates.Disabled && mouseState != ButtonMouseStates.Base) {
+						if ((functionState & SupportedFgFunctionStatesMask) == ButtonFunctionStates.None) {
 							continue;
 						}
 
-						if ((functionState & SupportedFgFunctionStatesMask) == ButtonFunctionStates.None) {
+						if (functionState == ButtonFunctionStates.Disabled && mouseState != ButtonMouseStates.Base) {
 							continue;
 						}
 

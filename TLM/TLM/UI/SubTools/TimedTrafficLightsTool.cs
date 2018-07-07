@@ -286,13 +286,15 @@ namespace TrafficManager.UI.SubTools {
 				MainTool.DrawNodeCircle(cameraInfo, HoveredNodeId, false, false);
 			}
 
-			if (MasterTimedTrafficLights == null) {
+			// TODO loop over selected nodes, as before
+			
+			/*if (MasterTimedTrafficLights == null) {
 				return;
 			}
 
 			foreach (var nodeId in MasterTimedTrafficLights.NodeGroup) {
 				MainTool.DrawNodeCircle(cameraInfo, nodeId, true, false);
-			}
+			}*/
 		}
 
 		private void _guiTimedControlPanel(int num) {
