@@ -474,6 +474,10 @@ namespace TrafficManager.TrafficLight.Impl {
 		public ITimedTrafficLightsStep GetStep(int stepId) {
 			// TODO currently, this method must be called for each node in the node group individually
 
+			if (stepId < 0 || stepId >= Steps.Count) {
+				return null;
+			}
+
 			return Steps[stepId];
 		}
 

@@ -31,6 +31,7 @@ namespace TrafficManager.TrafficLight {
 		ICustomSegmentLights RemoveSegmentLights(ushort segmentId);
 		bool SetSegmentLights(ushort segmentId, ICustomSegmentLights lights);
 		void SetStepDone();
+		bool ShouldGoToNextStep(out float metric);
 		bool ShouldGoToNextStep(float flow, float wait, out float metric);
 		void Start(int previousStepRefIndex = -1);
 		bool StepDone(bool updateValues);

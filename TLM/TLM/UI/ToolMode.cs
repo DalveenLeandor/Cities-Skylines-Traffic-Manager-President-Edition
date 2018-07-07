@@ -6,16 +6,12 @@ namespace TrafficManager.UI
         SwitchTrafficLight = 1,
         AddPrioritySigns = 2,
         ManualSwitch = 3,
-        TimedLightsSelectNode = 4,
-        TimedLightsShowLights = 5,
-        LaneChange = 6,
-		TimedLightsAddNode = 7,
-		TimedLightsRemoveNode = 8,
-		TimedLightsCopyLights = 9,
-		SpeedLimits = 10,
-		VehicleRestrictions = 11,
-		LaneConnector = 12,
-		JunctionRestrictions = 13,
-		ParkingRestrictions = 14
+        TimedLights = 4,
+        LaneChange = 5,
+		SpeedLimits = 6,
+		VehicleRestrictions = 7,
+		LaneConnector = 8,
+		JunctionRestrictions = 9,
+		ParkingRestrictions = 10
 	}
 }

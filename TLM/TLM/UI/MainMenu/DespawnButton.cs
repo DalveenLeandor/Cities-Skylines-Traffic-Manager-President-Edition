@@ -8,9 +8,9 @@ using TrafficManager.State;
 
 namespace TrafficManager.UI.MainMenu {
 	public class DespawnButton : MenuButton {
-		public override bool Active {
+		public override ButtonFunctionStates FunctionState {
 			get {
-				return false;
+				return ButtonFunctionStates.Default;
 			}
 		}
 

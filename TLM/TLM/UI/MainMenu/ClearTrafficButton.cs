@@ -8,9 +8,9 @@ using TrafficManager.Manager.Impl;
 
 namespace TrafficManager.UI.MainMenu {
 	public class ClearTrafficButton : MenuButton {
-		public override bool Active {
+		public override ButtonFunctionStates FunctionState {
 			get {
-				return false;
+				return ButtonFunctionStates.Default;
 			}
 		}
 

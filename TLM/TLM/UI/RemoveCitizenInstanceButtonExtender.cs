@@ -70,12 +70,6 @@ namespace TrafficManager.UI {
 				}
 			}
 
-			public override bool Active {
-				get {
-					return false;
-				}
-			}
-
 			public override Texture2D AtlasTexture {
 				get {
 					return TextureResources.RemoveButtonTexture2D;
@@ -124,8 +118,34 @@ namespace TrafficManager.UI {
 				}
 			}
 
-			public override bool CanActivate() {
-				return false;
+			public override ButtonMouseStates SupportedBgMouseStatesMask {
+				get {
+					return ButtonMouseStates.Base | ButtonMouseStates.Hovered | ButtonMouseStates.Pressed;
+				}
+			}
+
+			public override ButtonFunctionStates SupportedBgFunctionStatesMask {
+				get {
+					return ButtonFunctionStates.Default;
+				}
+			}
+
+			public override ButtonMouseStates SupportedFgMouseStatesMask {
+				get {
+					return ButtonMouseStates.Base | ButtonMouseStates.Hovered;
+				}
+			}
+
+			public override ButtonFunctionStates SupportedFgFunctionStatesMask {
+				get {
+					return ButtonFunctionStates.Default;
+				}
+			}
+
+			public override ButtonFunctionStates FunctionState {
+				get {
+					return ButtonFunctionStates.Default;
+				}
 			}
 		}
 	}

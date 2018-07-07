@@ -9,12 +9,23 @@ using TrafficManager.State;
 using TrafficManager.Util;
 using UnityEngine;
 
-namespace TrafficManager.UI.MainMenu {
+namespace TrafficManager.UI {
 	public abstract class LinearSpriteButton : UIButton {
-		public enum ButtonMouseState {
-			Base,
-			Hovered,
-			MouseDown
+		[Flags]
+		public enum ButtonMouseStates {
+			None = 0,
+			Base = 1,
+			Hovered = 1 << 1,
+			Pressed = 1 << 2,
+			Focused = 1 << 3
+		}
+
+		[Flags]
+		public enum ButtonFunctionStates {
+			None,
+			Default = 1,
+			Active = 1 << 1,
+			Disabled = 1 << 2
 		}
 
 		public const string MENU_BUTTON_BACKGROUND = "Bg";
@@ -22,37 +33,63 @@ namespace TrafficManager.UI.MainMenu {
 
 		public const string MENU_BUTTON_BASE = "Base";
 		public const string MENU_BUTTON_HOVERED = "Hovered";
-		public const string MENU_BUTTON_MOUSEDOWN = "MouseDown";
+		public const string MENU_BUTTON_PRESSED = "Pressed";
+		public const string MENU_BUTTON_FOCUSED = "Focused";
 
 		public const string MENU_BUTTON_DEFAULT = "Default";
 		public const string MENU_BUTTON_ACTIVE = "Active";
+		public const string MENU_BUTTON_DISABLED = "Disabled";
 
-		protected static string GetButtonBackgroundTextureId(string prefix, ButtonMouseState state, bool active) {
-			string ret = prefix + MENU_BUTTON_BACKGROUND;
+		private static string GetButtonTextureId(string prefix, ButtonMouseStates mouseState, ButtonFunctionStates functionState) {
+			string ret = prefix;
 
-			switch (state) {
-				case ButtonMouseState.Base:
+			if (functionState == ButtonFunctionStates.Disabled) {
+				mouseState = ButtonMouseStates.Base;
+			}
+
+			switch (mouseState) {
+				case ButtonMouseStates.Base:
 					ret += MENU_BUTTON_BASE;
 					break;
-				case ButtonMouseState.Hovered:
+				case ButtonMouseStates.Hovered:
 					ret += MENU_BUTTON_HOVERED;
 					break;
-				case ButtonMouseState.MouseDown:
-					ret += MENU_BUTTON_MOUSEDOWN;
+				case ButtonMouseStates.Pressed:
+					ret += MENU_BUTTON_PRESSED;
+					break;
+				case ButtonMouseStates.Focused:
+					ret += MENU_BUTTON_FOCUSED;
 					break;
 			}
 
-			ret += active ? MENU_BUTTON_ACTIVE : MENU_BUTTON_DEFAULT;
+			switch (functionState) {
+				case ButtonFunctionStates.Default:
+					ret += MENU_BUTTON_DEFAULT;
+					break;
+				case ButtonFunctionStates.Active:
+					ret += MENU_BUTTON_ACTIVE;
+					break;
+				case ButtonFunctionStates.Disabled:
+					ret += MENU_BUTTON_DISABLED;
+					break;
+			}
+
 			return ret;
 		}
 
-		protected static string GetButtonForegroundTextureId(string prefix, string function, bool active) {
-			string ret = prefix + MENU_BUTTON_FOREGROUND + function;
-			ret += active ? MENU_BUTTON_ACTIVE : MENU_BUTTON_DEFAULT;
-			return ret;
+		protected static string GetButtonBackgroundTextureId(string prefix, ButtonMouseStates mouseState, ButtonFunctionStates functionState) {
+			return GetButtonTextureId(prefix + MENU_BUTTON_BACKGROUND, mouseState, functionState);
 		}
 
-		public abstract bool CanActivate();
+		protected static string GetButtonForegroundTextureId(string prefix, string function, ButtonMouseStates mouseState, ButtonFunctionStates functionState) {
+			return GetButtonTextureId(prefix + MENU_BUTTON_FOREGROUND + function, mouseState, functionState);
+		}
+
+		public abstract ButtonMouseStates SupportedBgMouseStatesMask { get; }
+		public abstract ButtonFunctionStates SupportedBgFunctionStatesMask { get; }
+		public abstract ButtonMouseStates SupportedFgMouseStatesMask { get; }
+		public abstract ButtonFunctionStates SupportedFgFunctionStatesMask { get; }
+
 		public abstract string ButtonName { get; }
 		public abstract string FunctionName { get; }
 		public abstract string[] FunctionNames { get; }
@@ -62,22 +99,89 @@ namespace TrafficManager.UI.MainMenu {
 		public abstract int Height { get; }
 
 		public override void Start() {
-			string[] textureIds = new string[Enum.GetValues(typeof(ButtonMouseState)).Length * (CanActivate() ? 2 : 1) + FunctionNames.Length * 2];
+			int bgMouseStates = 0;
+			int bgFunctionStates = 0;
+			int fgMouseStates = 0;
+			int fgFunctionStates = 0;
+
+			bool supportsDisabledBg = false;
+			bool supportsDisabledFg = false;
+
+			foreach (ButtonMouseStates mouseState in EnumUtil.GetValues<ButtonMouseStates>()) {
+				if ((mouseState & SupportedBgMouseStatesMask) != ButtonMouseStates.None) {
+					++bgMouseStates;
+				} else if (mouseState == ButtonMouseStates.Base) {
+					throw new Exception("Background must support base mouse state");
+				}
+
+				if ((mouseState & SupportedFgMouseStatesMask) != ButtonMouseStates.None) {
+					++fgMouseStates;
+				} else if (mouseState == ButtonMouseStates.Base) {
+					throw new Exception("Foreground must support base mouse state");
+				}
+			}
+
+			foreach (ButtonFunctionStates functionState in EnumUtil.GetValues<ButtonFunctionStates>()) {
+				if ((functionState & SupportedBgFunctionStatesMask) != ButtonFunctionStates.None) {
+					if (functionState == ButtonFunctionStates.Disabled) {
+						supportsDisabledBg = true;
+					} else {
+						++bgFunctionStates;
+					}
+				} else if (functionState == ButtonFunctionStates.Default) {
+					throw new Exception("Background must support default function state");
+				}
+
+				if ((functionState & SupportedFgFunctionStatesMask) != ButtonFunctionStates.None) {
+					if (functionState == ButtonFunctionStates.Disabled) {
+						supportsDisabledFg = true;
+					} else {
+						++fgFunctionStates;
+					}
+				} else if (functionState == ButtonFunctionStates.Default) {
+					throw new Exception("Foreground must support default function state");
+				}
+			}
+
+			string[] textureIds = new string[bgMouseStates * bgFunctionStates + (supportsDisabledBg ? 1 : 0) + FunctionNames.Length * (fgMouseStates * fgFunctionStates + (supportsDisabledFg ? 1 : 0))];
 
 			int i = 0;
-			foreach (ButtonMouseState mouseState in EnumUtil.GetValues<ButtonMouseState>()) {
-				if (CanActivate()) {
-					textureIds[i++] = GetButtonBackgroundTextureId(ButtonName, mouseState, true);
+			foreach (ButtonMouseStates mouseState in EnumUtil.GetValues<ButtonMouseStates>()) {
+				if ((mouseState & SupportedBgMouseStatesMask) == ButtonMouseStates.None) {
+					continue;
 				}
-				textureIds[i++] = GetButtonBackgroundTextureId(ButtonName, mouseState, false);
+
+				foreach (ButtonFunctionStates functionState in EnumUtil.GetValues<ButtonFunctionStates>()) {
+					if (functionState == ButtonFunctionStates.Disabled && mouseState != ButtonMouseStates.Base) {
+						continue;
+					}
+
+					if ((functionState & SupportedBgFunctionStatesMask) == ButtonFunctionStates.None) {
+						continue;
+					}
+
+					textureIds[i++] = GetButtonBackgroundTextureId(ButtonName, mouseState, functionState);
+				}
 			}
 
 			foreach (string function in FunctionNames) {
-				textureIds[i++] = GetButtonForegroundTextureId(ButtonName, function, false);
-			}
+				foreach (ButtonMouseStates mouseState in EnumUtil.GetValues<ButtonMouseStates>()) {
+					if ((mouseState & SupportedFgMouseStatesMask) == ButtonMouseStates.None) {
+						continue;
+					}
 
-			foreach (string function in FunctionNames) {
-				textureIds[i++] = GetButtonForegroundTextureId(ButtonName, function, true);
+					foreach (ButtonFunctionStates functionState in EnumUtil.GetValues<ButtonFunctionStates>()) {
+						if (functionState == ButtonFunctionStates.Disabled && mouseState != ButtonMouseStates.Base) {
+							continue;
+						}
+
+						if ((functionState & SupportedFgFunctionStatesMask) == ButtonFunctionStates.None) {
+							continue;
+						}
+
+						textureIds[i++] = GetButtonForegroundTextureId(ButtonName, function, mouseState, functionState);
+					}
+				}
 			}
 
 			// Set the atlases for background/foreground
@@ -88,9 +192,10 @@ namespace TrafficManager.UI.MainMenu {
 
 			// Enable button sounds.
 			playAudioEvents = true;
+			foregroundSpriteMode = UIForegroundSpriteMode.Scale;
 		}
 
-		public abstract bool Active { get; }
+		public abstract ButtonFunctionStates FunctionState { get; }
 		public abstract string Tooltip { get; }
 		public abstract bool Visible { get; }
 		public abstract void HandleClick(UIMouseEventParameter p);
@@ -100,19 +205,51 @@ namespace TrafficManager.UI.MainMenu {
 			UpdateProperties();
 		}
 
-		internal void UpdateProperties() {
-			bool active = CanActivate() ? Active : false;
+		public void UpdateProperties() {
+			//Log.Warning($"{this.GetType().Name}.UpdateProperties called. isVisible={isVisible} enabled={enabled}");
 
-			m_BackgroundSprites.m_Normal = m_BackgroundSprites.m_Disabled = m_BackgroundSprites.m_Focused = GetButtonBackgroundTextureId(ButtonName, ButtonMouseState.Base, active);
-			m_BackgroundSprites.m_Hovered = GetButtonBackgroundTextureId(ButtonName, ButtonMouseState.Hovered, active);
-			m_PressedBgSprite = GetButtonBackgroundTextureId(ButtonName, ButtonMouseState.MouseDown, active);
+			ButtonFunctionStates bgFuncState = ButtonFunctionStates.Default;
+			ButtonFunctionStates fgFuncState = ButtonFunctionStates.Default;
 
-			m_ForegroundSprites.m_Normal = m_ForegroundSprites.m_Disabled = m_ForegroundSprites.m_Focused = GetButtonForegroundTextureId(ButtonName, FunctionName, active);
-			m_ForegroundSprites.m_Hovered = m_PressedFgSprite = GetButtonForegroundTextureId(ButtonName, FunctionName, true);
+			if ((SupportedBgFunctionStatesMask & FunctionState) != ButtonFunctionStates.None) {
+				bgFuncState = FunctionState;
+			}
+
+			if ((SupportedFgFunctionStatesMask & FunctionState) != ButtonFunctionStates.None) {
+				fgFuncState = FunctionState;
+			}
+
+			ButtonMouseStates bgBaseState = ButtonMouseStates.Base;
+			m_BackgroundSprites.m_Normal = m_BackgroundSprites.m_Disabled = GetButtonBackgroundTextureId(ButtonName, bgBaseState, bgFuncState);
+
+			ButtonMouseStates bgHoveredState = (SupportedBgMouseStatesMask & ButtonMouseStates.Hovered) != ButtonMouseStates.None ? ButtonMouseStates.Hovered : bgBaseState;
+			m_BackgroundSprites.m_Hovered = GetButtonBackgroundTextureId(ButtonName, bgHoveredState, bgFuncState);
+
+			ButtonMouseStates bgPressedState = (SupportedBgMouseStatesMask & ButtonMouseStates.Pressed) != ButtonMouseStates.None ? ButtonMouseStates.Pressed : bgHoveredState;
+			m_PressedBgSprite = GetButtonBackgroundTextureId(ButtonName, bgPressedState, bgFuncState);
+
+			ButtonMouseStates bgFocusedState = (SupportedBgMouseStatesMask & ButtonMouseStates.Focused) != ButtonMouseStates.None ? ButtonMouseStates.Focused : bgPressedState;
+			m_BackgroundSprites.m_Focused = GetButtonBackgroundTextureId(ButtonName, bgFocusedState, bgFuncState);
+
+
+			ButtonMouseStates fgBaseState = ButtonMouseStates.Base;
+			m_ForegroundSprites.m_Normal = m_ForegroundSprites.m_Disabled = GetButtonForegroundTextureId(ButtonName, FunctionName, fgBaseState, fgFuncState);
+
+			ButtonMouseStates fgHoveredState = (SupportedFgMouseStatesMask & ButtonMouseStates.Hovered) != ButtonMouseStates.None ? ButtonMouseStates.Hovered : fgBaseState;
+			m_ForegroundSprites.m_Hovered = GetButtonForegroundTextureId(ButtonName, FunctionName, fgHoveredState, fgFuncState);
+
+			ButtonMouseStates fgPressedState = (SupportedFgMouseStatesMask & ButtonMouseStates.Pressed) != ButtonMouseStates.None ? ButtonMouseStates.Pressed : fgHoveredState;
+			m_PressedFgSprite = GetButtonForegroundTextureId(ButtonName, FunctionName, fgPressedState, fgFuncState);
+
+			ButtonMouseStates fgFocusedState = (SupportedFgMouseStatesMask & ButtonMouseStates.Focused) != ButtonMouseStates.None ? ButtonMouseStates.Focused : fgPressedState;
+			m_ForegroundSprites.m_Focused = GetButtonForegroundTextureId(ButtonName, FunctionName, fgFocusedState, fgFuncState);
 
 			tooltip = Translation.GetString(Tooltip);
 			isVisible = Visible;
+			state = FunctionState != ButtonFunctionStates.Disabled ? ButtonState.Normal : ButtonState.Disabled;
 			this.Invalidate();
+
+			//Log.Warning($"{this.GetType().Name}.UpdateProperties finished. Visible={Visible} isVisible={isVisible} FunctionState={FunctionState} enabled={enabled}");
 		}
 	}
 }

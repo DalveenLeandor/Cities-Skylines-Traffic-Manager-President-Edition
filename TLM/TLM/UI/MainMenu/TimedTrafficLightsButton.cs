@@ -10,7 +10,7 @@ namespace TrafficManager.UI.MainMenu {
 	public class TimedTrafficLightsButton : MenuToolModeButton {
 		public override ToolMode ToolMode {
 			get {
-				return ToolMode.TimedLightsSelectNode;
+				return ToolMode.TimedLights;
 			}
 		}
 		

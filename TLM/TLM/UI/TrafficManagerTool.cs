@@ -123,16 +123,26 @@ namespace TrafficManager.UI {
 
 		internal void Initialize() {
 			Log.Info("TrafficManagerTool: Initialization running now.");
+			
+
+			Log.Info("TrafficManagerTool: Initialization completed.");
+		}
+
+		internal void InitializeSubTools() {
+			foreach (KeyValuePair<ToolMode, SubTool> e in subTools) {
+				e.Value.Initialize();
+			}
+		}
+
+		protected override void Awake() {
+			Log._Debug($"TrafficLightTool: Awake {this.GetHashCode()}");
+			base.Awake();
+
 			subTools.Clear();
 			subTools[ToolMode.SwitchTrafficLight] = new ToggleTrafficLightsTool(this);
 			subTools[ToolMode.AddPrioritySigns] = new PrioritySignsTool(this);
 			subTools[ToolMode.ManualSwitch] = new ManualTrafficLightsTool(this);
-			SubTool timedLightsTool = new TimedTrafficLightsTool(this);
-			subTools[ToolMode.TimedLightsAddNode] = timedLightsTool;
-			subTools[ToolMode.TimedLightsRemoveNode] = timedLightsTool;
-			subTools[ToolMode.TimedLightsSelectNode] = timedLightsTool;
-			subTools[ToolMode.TimedLightsShowLights] = timedLightsTool;
-			subTools[ToolMode.TimedLightsCopyLights] = timedLightsTool;
+			subTools[ToolMode.TimedLights] = new TimedTrafficLightsTool(this);
 			subTools[ToolMode.VehicleRestrictions] = new VehicleRestrictionsTool(this);
 			subTools[ToolMode.SpeedLimits] = new SpeedLimitsTool(this);
 			subTools[ToolMode.LaneChange] = new LaneArrowTool(this);
@@ -154,17 +164,6 @@ namespace TrafficManager.UI {
 
 		public void OnUpdate(IObservable<GlobalConfig> observable) {
 			InitializeSubTools();
-		}
-
-		internal void InitializeSubTools() {
-			foreach (KeyValuePair<ToolMode, SubTool> e in subTools) {
-				e.Value.Initialize();
-			}
-		}
-
-		protected override void Awake() {
-			Log._Debug($"TrafficLightTool: Awake {this.GetHashCode()}");
-			base.Awake();
 		}
 
 		public SubTool GetSubTool(ToolMode mode) {
@@ -190,42 +189,18 @@ namespace TrafficManager.UI {
 			if (!subTools.TryGetValue(_toolMode, out activeSubTool)) {
 				activeSubTool = null;
 			}
-			bool realToolChange = toolModeChanged;
-
-			if (oldSubTool != null) {
-				if ((oldToolMode == ToolMode.TimedLightsSelectNode || oldToolMode == ToolMode.TimedLightsShowLights || oldToolMode == ToolMode.TimedLightsAddNode || oldToolMode == ToolMode.TimedLightsRemoveNode || oldToolMode == ToolMode.TimedLightsCopyLights)) { // TODO refactor to SubToolMode
-					if (mode != ToolMode.TimedLightsSelectNode && mode != ToolMode.TimedLightsShowLights && mode != ToolMode.TimedLightsAddNode && mode != ToolMode.TimedLightsRemoveNode && mode != ToolMode.TimedLightsCopyLights) {
-						oldSubTool.Cleanup();
-					}
-				} else {
-					oldSubTool.Cleanup();
-				}
-			}
-
-			if (toolModeChanged && activeSubTool != null) {
-				if ((oldToolMode == ToolMode.TimedLightsSelectNode || oldToolMode == ToolMode.TimedLightsShowLights || oldToolMode == ToolMode.TimedLightsAddNode || oldToolMode == ToolMode.TimedLightsRemoveNode || oldToolMode == ToolMode.TimedLightsCopyLights)) { // TODO refactor to SubToolMode
-
-					if (mode != ToolMode.TimedLightsSelectNode && mode != ToolMode.TimedLightsShowLights && mode != ToolMode.TimedLightsAddNode && mode != ToolMode.TimedLightsRemoveNode && mode != ToolMode.TimedLightsCopyLights) {
-						activeSubTool.Cleanup();
-					} else {
-						realToolChange = false;
-					}
-				} else {
-					activeSubTool.Cleanup();
-				}
-			}
 
 			SelectedNodeId = 0;
 			SelectedSegmentId = 0;
 
-			//Log._Debug($"Getting activeSubTool for mode {_toolMode} {subTools.Count}");
+			if (toolModeChanged) {
+				if (oldSubTool != null) {
+					oldSubTool.Cleanup();
+				}
 
-			//subTools.TryGetValue((int)_toolMode, out activeSubTool);
-			//Log._Debug($"activeSubTool is now {activeSubTool}");
-
-			if (toolModeChanged && activeSubTool != null) {
-				activeSubTool.OnActivate();
-				if (realToolChange) {
+				if (activeSubTool != null) {
+					activeSubTool.Cleanup();
+					activeSubTool.OnActivate();
 					ShowAdvisor(activeSubTool.GetTutorialKey());
 				}
 			}

@@ -468,6 +468,10 @@ namespace TrafficManager.TrafficLight.Impl {
 			// we are the master node
 
 			if (timedNode.IsInTestMode()) {
+				float wait, flow;
+				CalcWaitFlow(true, timedNode.CurrentStep, out wait, out flow);
+				CurrentFlow = wait;
+				CurrentWait = flow;
 				return false;
 			}
 			if (stepDone) {
@@ -570,6 +574,10 @@ namespace TrafficManager.TrafficLight.Impl {
 				case StepChangeMetric.NoWait:
 					return wait > 0 ? 1f : 0f;
 			}
+		}
+
+		public bool ShouldGoToNextStep(out float metric) {
+			return ShouldGoToNextStep(CurrentFlow, CurrentWait, out metric);
 		}
 
 		public bool ShouldGoToNextStep(float flow, float wait, out float metric) {

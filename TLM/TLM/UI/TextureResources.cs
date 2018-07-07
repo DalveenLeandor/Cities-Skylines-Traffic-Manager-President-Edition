@@ -63,6 +63,7 @@ namespace TrafficManager.UI
 		public static readonly Texture2D NoImageTexture2D;
 		public static readonly Texture2D RemoveButtonTexture2D;
 		public static readonly Texture2D WindowBackgroundTexture2D;
+		public static readonly Texture2D ToolButtonsTexture2D;
 
 		static TextureResources()
         {
@@ -76,6 +77,10 @@ namespace TrafficManager.UI
 			// main menu buttons
 			MainMenuButtonsTexture2D = LoadDllResource("mainmenu-btns.png", 960, 30);
 			MainMenuButtonsTexture2D.name = "TMPE_MainMenuButtons";
+
+			// main menu buttons
+			ToolButtonsTexture2D = LoadDllResource("tool-btns.png", 1480, 40);
+			ToolButtonsTexture2D.name = "TMPE_ToolButtons";
 
 			// simple
 			RedLightTexture2D = LoadDllResource("light_1_1.png", 103, 243);

@@ -9,14 +9,14 @@ namespace TrafficManager.UI.MainMenu {
 	public abstract class MenuToolModeButton : MenuButton {
 		public abstract ToolMode ToolMode { get; }
 
-		public override bool Active {
+		public override ButtonFunctionStates FunctionState {
 			get {
-				return this.ToolMode.Equals(UIBase.GetTrafficManagerTool(false)?.GetToolMode());
+				return this.ToolMode.Equals(UIBase.GetTrafficManagerTool(false)?.GetToolMode()) ? ButtonFunctionStates.Active : ButtonFunctionStates.Default;
 			}
 		}
 
 		public override void OnClickInternal(UIMouseEventParameter p) {
-			if (Active) {
+			if (FunctionState == ButtonFunctionStates.Active) {
 				UIBase.GetTrafficManagerTool(true).SetToolMode(ToolMode.None);
 			} else {
 				UIBase.GetTrafficManagerTool(true).SetToolMode(this.ToolMode);

@@ -262,6 +262,14 @@
     <Compile Include="UI\MainMenu\MenuButton.cs" />
     <Compile Include="UI\LinearSpriteButton.cs" />
     <Compile Include="UI\SubTools\ParkingRestrictionsTool.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UIModifyStepPanel.cs" />
+    <Compile Include="UI\UIToolButton.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UITimedTrafficLightsContentPanel.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UICopyPanel.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UIRemoveNodePanel.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UIAddNodePanel.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UIShowLightsPanel.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UISelectNodePanel.cs" />
     <Compile Include="UI\UIMainMenuButton.cs" />
     <Compile Include="UI\SubTool.cs" />
     <Compile Include="UI\SubTools\JunctionRestrictionsTool.cs" />
@@ -282,6 +290,7 @@
     <Compile Include="UI\TransportDemandViewMode.cs" />
     <Compile Include="UI\UITransportDemand.cs" />
     <Compile Include="Util\GenericObservable.cs" />
+    <Compile Include="UI\SubTools\TimedTrafficLights\UITimedTrafficLightsWindow.cs" />
     <Compile Include="Util\GenericUnsubscriber.cs" />
     <Compile Include="Manager\ICustomManager.cs" />
     <Compile Include="Util\IObservable.cs" />
@@ -441,6 +450,10 @@
       <Project>{D3ADE06E-F493-4819-865A-3BB44FEEDF01}</Project>
       <Name>CSUtil.Commons</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CSUtil.UI\CSUtil.UI.csproj">
+      <Project>{7297F604-7558-4250-96B7-66374963D430}</Project>
+      <Name>CSUtil.UI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TMPE.CitiesGameBridge\TMPE.CitiesGameBridge.csproj">
       <Project>{3f2f7926-5d51-4880-a2b7-4594a10d7e54}</Project>
       <Name>TMPE.CitiesGameBridge</Name>
@@ -466,6 +479,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\WindowBackground.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\tool-btns.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(TargetName)"
@@ -477,6 +493,7 @@ xcopy /y "$(TargetDir)CSUtil.CameraControl.dll" "$(LOCALAPPDATA)\Colossal Order\
 xcopy /y "$(TargetDir)TMPE.RedirectionFramework.dll" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(TargetName)"
 xcopy /y "$(TargetDir)CSUtil.Commons.dll" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(TargetName)"
 xcopy /y "$(TargetDir)0TMPE.Harmony.dll" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(TargetName)"
+xcopy /y "$(TargetDir)CSUtil.UI.dll" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(TargetName)"
 
 del /Q "D:\Games\Steam\steamapps\workshop\content\255710\583429740\*"
 xcopy /y "$(TargetDir)TrafficManager.dll" "D:\Games\Steam\steamapps\workshop\content\255710\583429740"
@@ -485,7 +502,9 @@ xcopy /y "$(TargetDir)TMPE.GenericGameBridge.dll" "D:\Games\Steam\steamapps\work
 xcopy /y "$(TargetDir)CSUtil.CameraControl.dll" "D:\Games\Steam\steamapps\workshop\content\255710\583429740"
 xcopy /y "$(TargetDir)TMPE.RedirectionFramework.dll" "D:\Games\Steam\steamapps\workshop\content\255710\583429740"
 xcopy /y "$(TargetDir)CSUtil.Commons.dll" "D:\Games\Steam\steamapps\workshop\content\255710\583429740"
-xcopy /y "$(TargetDir)0TMPE.Harmony.dll" "D:\Games\Steam\steamapps\workshop\content\255710\583429740"</PostBuildEvent>
+xcopy /y "$(TargetDir)0TMPE.Harmony.dll" "D:\Games\Steam\steamapps\workshop\content\255710\583429740"
+xcopy /y "$(TargetDir)CSUtil.UI.dll" "D:\Games\Steam\steamapps\workshop\content\255710\583429740"
+</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

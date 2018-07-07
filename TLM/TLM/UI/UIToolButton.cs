@@ -9,37 +9,32 @@ using TrafficManager.State;
 using TrafficManager.Util;
 using UnityEngine;
 
-namespace TrafficManager.UI.MainMenu {
-	public abstract class MenuButton : LinearSpriteButton {
+namespace TrafficManager.UI {
+	public abstract class UIToolButton : LinearSpriteButton {
 		public enum ButtonFunction {
-			LaneConnector,
-			ClearTraffic,
-			DespawnDisabled,
-			DespawnEnabled,
-			JunctionRestrictions,
-			LaneArrows,
-			ManualTrafficLights,
-			PrioritySigns,
-			SpeedLimits,
-			TimedTrafficLights,
-			ToggleTrafficLights,
-			VehicleRestrictions,
-			ParkingRestrictions
+			Add,
+			Cancel,
+			Copy,
+			Delete,
+			Down,
+			Edit,
+			Load,
+			NotOk,
+			Ok,
+			Remove,
+			RotateLeft,
+			RotateRight,
+			Save,
+			Setup,
+			Up,
+			View
 		}
 
-		public const string MENU_BUTTON = "TMPE_MenuButton";
-		public const int BUTTON_SIZE = 30;
+		public const string MENU_BUTTON = "TMPE_ToolButton";
+		public const int BUTTON_SIZE = 20;
 		public override void HandleClick(UIMouseEventParameter p) { }
-
-		protected override void OnClick(UIMouseEventParameter p) {
-			OnClickInternal(p);
-			foreach (MenuButton button in LoadingExtension.BaseUI.MainMenu.Buttons) {
-				button.UpdateProperties();
-			}
-		}
-
-		public abstract void OnClickInternal(UIMouseEventParameter p);
 		public abstract ButtonFunction Function { get; }
+		private ButtonFunctionStates lastFunctionState = ButtonFunctionStates.Default;
 
 		public override string ButtonName {
 			get {
@@ -66,43 +61,52 @@ namespace TrafficManager.UI.MainMenu {
 
 		public override Texture2D AtlasTexture {
 			get {
-				return TextureResources.MainMenuButtonsTexture2D;
+				return TextureResources.ToolButtonsTexture2D;
 			}
 		}
 
 		public override int Width {
 			get {
-				return 50;
+				return BUTTON_SIZE;
 			}
 		}
 
 		public override int Height {
 			get {
-				return 50;
+				return BUTTON_SIZE;
 			}
 		}
 
 		public override ButtonMouseStates SupportedBgMouseStatesMask {
 			get {
-				return ButtonMouseStates.Base | ButtonMouseStates.Hovered | ButtonMouseStates.Pressed;
+				return ButtonMouseStates.Base | ButtonMouseStates.Hovered | ButtonMouseStates.Pressed | ButtonMouseStates.Focused;
 			}
 		}
 
 		public override ButtonFunctionStates SupportedBgFunctionStatesMask {
 			get {
-				return ButtonFunctionStates.Default | ButtonFunctionStates.Active;
+				return ButtonFunctionStates.Default | ButtonFunctionStates.Disabled;
 			}
 		}
 
 		public override ButtonMouseStates SupportedFgMouseStatesMask {
 			get {
-				return ButtonMouseStates.Base | ButtonMouseStates.Hovered;
+				return ButtonMouseStates.Base;
 			}
 		}
 
 		public override ButtonFunctionStates SupportedFgFunctionStatesMask {
 			get {
-				return ButtonFunctionStates.Default;
+				return ButtonFunctionStates.Default | ButtonFunctionStates.Disabled;
+			}
+		}
+
+		public override void Update() {
+			base.Update();
+
+			if (FunctionState != lastFunctionState || Visible != isVisible) {
+				lastFunctionState = FunctionState;
+				UpdateProperties();
 			}
 		}
 	}

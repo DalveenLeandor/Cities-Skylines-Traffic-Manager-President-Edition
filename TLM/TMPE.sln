@@ -38,7 +38,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptionsFramework", "Options
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSUtil.CameraControl", "CSUtil.CameraControl\CSUtil.CameraControl\CSUtil.CameraControl\CSUtil.CameraControl.csproj", "{F8759084-DF5B-4A54-B73C-824640A8FA3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMPE.RedirectionFramework", "TMPE.RedirectionFramework\TMPE.RedirectionFramework.csproj", "{AA84F143-E218-45ED-AAEB-6EC3AF1F176E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSUtil.UI", "CSUtil.UI\CSUtil.UI.csproj", "{7297F604-7558-4250-96B7-66374963D430}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -128,6 +128,14 @@ Global
 		{AA84F143-E218-45ED-AAEB-6EC3AF1F176E}.FullDebug|Any CPU.Build.0 = Debug|Any CPU
 		{AA84F143-E218-45ED-AAEB-6EC3AF1F176E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA84F143-E218-45ED-AAEB-6EC3AF1F176E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.Benchmark|Any CPU.ActiveCfg = Release|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.Benchmark|Any CPU.Build.0 = Release|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.FullDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.FullDebug|Any CPU.Build.0 = Debug|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7297F604-7558-4250-96B7-66374963D430}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
